@@ -1,5 +1,7 @@
 # MinhaCarteira
 
+API REST desenvolvida para realização de transações entre usuários
+
 ## Tecnologias utilizadas
 
 As seguintes tecnologias foram usadas na construção do projeto:
