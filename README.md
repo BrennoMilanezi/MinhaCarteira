@@ -21,9 +21,9 @@ As seguintes ferramentas foram usadas na construção do projeto:
 ## Documentação API
 
 Recursos disponíveis para acesso via API:
-* [**Auth**]
-* [**Users**]
-* [**Transactions**]
+* [**Auth**] (/auth)
+* [**Users**] (/users)
+* [**Transactions**] (/transactions)
 
 ## Métodos
 Requisições para a API devem seguir os padrões:
@@ -141,8 +141,8 @@ Os usuários podem ser comuns e lojistas.
 + Response 200 (application/json)
 
             {
-                "codigo": 1,
-                "nome": "Nome do contato"
+                "status": "success",
+                "data": "Usuário(a) inserido com sucesso"
             }
             
 + Response 401 (application/json)
@@ -184,4 +184,118 @@ Os usuários podem ser comuns e lojistas.
             {
                 "status": "error",
                 "message": "Nenhum usuário encontrado"
+            }
+
+# Transactions [/transactions]
+
+Usuários podem enviar dinheiro (efetuar transferência) para lojistas e entre usuários.
+Lojistas só recebem transferências, não enviam dinheiro para ninguém.
+
+### Listar (List) [GET]
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+         {
+            "status": "success",
+            "data": [
+                {
+                    "id": "1",
+                    "id_pagador": "1",
+                    "id_beneficiario": "2",
+                    "valor": "12.03",
+                    "data": "2021-04-07 12:01:47"
+                }
+            ]
+          }
+
++ Response 401 (application/json)
+
+          {
+              "status": "error",
+              "message": "Não autenticado"
+          }
+
+### Novo (Create) [POST]
+
++ Attributes (object)
+
+    + valor: valor da transação (float, required)
+    + id_pagador: id do usuário comum pagador (number, required)
+    + id_beneficiario: id do usuário comum/lojista beneficiário (number, required)
+
++ Request (application/json)
+
+    + Body
+
+            {
+                "valor": 12.03,
+                "id_pagador": 1,
+                "id_beneficiario": 2
+            }
+
++ Response 200 (application/json)
+
+            {
+                "status": "success",
+                "data": "Transação realizada"
+            }
+            
++ Response 401 (application/json)
+  Quando o pagador e beneficiário são iguais
+
+            {
+                "status": "error",
+                "message": "Pagador e beneficiário iguais"
+            }
+            
+  Quando o pagador não tem saldo suficiente e/ou o pagador é um lojista
+
+            {
+                "status": "error",
+                "message": "Transação não autorizada"
+            }
+
+Quando o beneficiário não é encontrado
+
+            {
+                "status": "error",
+                "message": "Beneficiário não encontrado"
+            }
+
+### Detalhar (Read) [GET /transactions/{transaction_id}]
+
++ Parameters
+    + codigo (required, number) ... ID da transação
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+            {
+                "status": "success",
+                "data": {
+                    "id": "1",
+                    "id_pagador": "1",
+                    "id_beneficiario": "2",
+                    "valor": "12.03",
+                    "data": "2021-04-07 12:01:47"
+                }
+            }
+
++ Response 401 (application/json)
+  Quando registro não for encontrado.
+
+            {
+                "status": "error",
+                "message": "Nenhuma transação encontrada"
             }
